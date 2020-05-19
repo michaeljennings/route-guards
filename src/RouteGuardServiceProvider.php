@@ -15,7 +15,17 @@ class RouteGuardServiceProvider extends ServiceProvider
     public function boot()
     {
         Route::macro('guard', function (string $guard, string $binding = null) {
-            $this->action['guard'] = $binding ? [$binding => $guard] : $guard;
+            if (! isset($this->action['guard'])) {
+                $this->action['guard'] = [];
+            }
+
+            if ($binding) {
+                $this->action['guard'][$binding] = $guard;
+            } else {
+                $this->action['guard'][] = $guard;
+            }
+
+            return $this;
         });
     }
 }
