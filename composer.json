@@ -1,0 +1,39 @@
+{
+  "name": "michaeljennings/route-guards",
+  "description": "Provides a convenient place to authorize routes when model policies cannot be used",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Michael Jennings",
+      "email": "michael.jennings91@gmail.com"
+    }
+  ],
+  "require": {
+    "php": ">=7.2",
+    "illuminate/routing": ">=6.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.1"
+  },
+  "autoload": {
+    "psr-4": {
+      "MichaelJennings\\RouteGuards\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "MichaelJennings\\RouteGuards\\Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "sort-packages": true
+  },
+  "extra": {
+    "laravel": {
+      "providers": [
+        "MichaelJennings\\RouteGuards\\RouteGuardServiceProvider"
+      ]
+    }
+  }
+}
