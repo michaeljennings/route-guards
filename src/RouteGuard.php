@@ -18,16 +18,15 @@ class RouteGuard
      * Authorize that the user can access the route.
      *
      * @param Route       $route
-     * @param string|null $method
+     * @param string|null $binding
      * @throws AuthorizationException
      */
-    public function guard(Route $route, string $method = null): void
+    public function guard(Route $route, string $binding = null): void
     {
-        if (! $method) {
-            $method = $this->getMethod($route);
-        }
+        $method = $this->getMethod($route);
+        $resource = $binding ? $this->find($route, $binding) : null;
 
-        if (! $this->$method($route)) {
+        if (! $this->$method($route, $resource)) {
             $failureMethod = $method . 'Failed';
 
             if (method_exists($this, $failureMethod)) {
@@ -36,6 +35,18 @@ class RouteGuard
                 $this->authorizationFailed();
             }
         }
+    }
+
+    /**
+     * Find the resource to authenticate from its route binding.
+     *
+     * @param Route  $route
+     * @param string $binding
+     * @return object|string|null
+     */
+    protected function find(Route $route, string $binding)
+    {
+        return $route->parameter($binding);
     }
 
     /**
