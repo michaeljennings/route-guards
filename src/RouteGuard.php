@@ -24,7 +24,7 @@ class RouteGuard
     public function guard(Route $route, string $binding = null): void
     {
         $method = $this->getMethod($route);
-        $resource = $binding ? $this->find($route, $binding) : null;
+        $resource = $this->getResource($route, $binding);
 
         if (! $this->$method($route, $resource)) {
             $failureMethod = $method . 'Failed';
@@ -35,18 +35,6 @@ class RouteGuard
                 $this->authorizationFailed();
             }
         }
-    }
-
-    /**
-     * Find the resource to authenticate from its route binding.
-     *
-     * @param Route  $route
-     * @param string $binding
-     * @return object|string|null
-     */
-    protected function find(Route $route, string $binding)
-    {
-        return $route->parameter($binding);
     }
 
     /**
@@ -66,6 +54,40 @@ class RouteGuard
         $method = last(explode('@', $uses));
 
         return method_exists($this, $method) ? $method : $this->defaultMethod;
+    }
+
+    /**
+     * Get the resource to authenticate against.
+     *
+     * @param Route       $route
+     * @param string|null $binding
+     * @return object|string|null
+     */
+    protected function getResource(Route $route, string $binding = null)
+    {
+        if (! $binding) {
+            $parameters = $route->parameters();
+
+            if (count($parameters) !== 1) {
+                return null;
+            }
+
+            $binding = array_keys($parameters)[0];
+        }
+
+        return $this->find($route, $binding);
+    }
+
+    /**
+     * Find the resource to authenticate from its route binding.
+     *
+     * @param Route  $route
+     * @param string $binding
+     * @return object|string|null
+     */
+    protected function find(Route $route, string $binding)
+    {
+        return $route->parameter($binding);
     }
 
     /**

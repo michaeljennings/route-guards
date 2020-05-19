@@ -69,6 +69,7 @@ class GuardRoutesTest extends TestCase
     {
         $route = Mockery::mock(Route::class);
 
+        $route->shouldReceive('parameters')->andReturn([]);
         $route->shouldReceive('getAction')->andReturnUsing(function ($argument) use ($method, $guards) {
             if ($argument === 'guard') {
                 return $guards;

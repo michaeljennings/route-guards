@@ -18,6 +18,7 @@ class RouteGuardTest extends TestCase
         $route = Mockery::mock(Route::class);
 
         $route->shouldReceive('getAction')->andReturn('TestController@index');
+        $route->shouldReceive('parameters')->andReturn([]);
 
         $guard = new class extends RouteGuard {
             public function authorize(Route $route): bool
@@ -39,6 +40,7 @@ class RouteGuardTest extends TestCase
         $route = Mockery::mock(Route::class);
 
         $route->shouldReceive('getAction')->andReturn('TestController@index');
+        $route->shouldReceive('parameters')->andReturn([]);
 
         $guard = new class extends RouteGuard {
             public function authorize(Route $route): bool
@@ -58,6 +60,7 @@ class RouteGuardTest extends TestCase
         $route = Mockery::mock(Route::class);
 
         $route->shouldReceive('getAction')->andReturn('TestController@index');
+        $route->shouldReceive('parameters')->andReturn([]);
 
         $guard = new class extends RouteGuard {
             public function authorize(Route $route): bool
@@ -82,6 +85,7 @@ class RouteGuardTest extends TestCase
         $route = Mockery::mock(Route::class);
 
         $route->shouldReceive('getAction')->andReturn(null);
+        $route->shouldReceive('parameters')->andReturn([]);
 
         $guard = new class extends RouteGuard {
             public function authorize(Route $route): bool
@@ -103,6 +107,7 @@ class RouteGuardTest extends TestCase
         $route = Mockery::mock(Route::class);
 
         $route->shouldReceive('getAction')->andReturn('TestController@index');
+        $route->shouldReceive('parameters')->andReturn([]);
 
         $guard = new class extends RouteGuard {
             public function index(Route $route): bool
@@ -137,6 +142,47 @@ class RouteGuardTest extends TestCase
         };
 
         $guard->guard($route, 'test');
+    }
+
+    /**
+     * @test
+     */
+    public function itBindsToTheFirstParameterIfABindingIsNotSpecified()
+    {
+        $route = Mockery::mock(Route::class);
+
+        $route->shouldReceive('getAction')->andReturn('TestController@index');
+        $route->shouldReceive('parameters')->andReturn(['foo' => 'bar']);
+        $route->shouldReceive('parameter')->andReturn('bar');
+
+        $guard = new class extends RouteGuard {
+            public function authorize(Route $route, string $parameter): bool
+            {
+                return $parameter === 'bar';
+            }
+        };
+
+        $guard->guard($route);
+    }
+
+    /**
+     * @test
+     */
+    public function itDoesNotBindIfThereIsMoreThanOneParameter()
+    {
+        $route = Mockery::mock(Route::class);
+
+        $route->shouldReceive('getAction')->andReturn('TestController@index');
+        $route->shouldReceive('parameters')->andReturn(['foo' => 'bar', 'baz' => 'qux']);
+
+        $guard = new class extends RouteGuard {
+            public function authorize(Route $route, $parameter): bool
+            {
+                return is_null($parameter);
+            }
+        };
+
+        $guard->guard($route);
     }
 
     /**
